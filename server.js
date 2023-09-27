@@ -40,6 +40,22 @@ app.post('/notes', async (req, res) => {
     }
 });
 
+app.delete('/notes/:id', async (req, res) => {
+    const {id} = req.params;
+
+    try {
+        const deletedNote = await Note.findByIdAndDelete(id);
+
+        if (!deletedNote) {
+            return res.status(404).json({message: 'Note not found'});
+        }
+
+        res.json(deletedNote);
+    } catch (error) {
+        res.status(500).json({message: 'Internal Server Error'});
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
