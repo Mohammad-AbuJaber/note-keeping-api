@@ -21,6 +21,27 @@ app.get('/notes', async (req, res) => {
     }
 });
 
+app.get('/notes/search', async (req, res) => {
+    const query = req.query.query;
+
+    if (!query) {
+        return res.status(400).json({message: 'Query parameter is required'});
+    }
+
+    try {
+        const notes = await Note.find({
+            $or: [
+                {title: {$regex: query, $options: 'i'}},
+                {content: {$regex: query, $options: 'i'}}
+            ]
+        });
+
+        res.json(notes);
+    } catch (error) {
+        res.status(500).json({message: 'Internal Server Error'});
+    }
+});
+
 app.get('/notes/:id', async (req, res) => {
     const {id} = req.params;
 
