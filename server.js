@@ -13,9 +13,22 @@ mongoose.connect('mongodb://127.0.0.1:27017/note-keeping', {
 });
 
 app.get('/notes', async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
     try {
-        const notes = await Note.find();
-        res.json(notes);
+        const totalNotes = await Note.countDocuments();
+        const totalPages = Math.ceil(totalNotes / limit);
+
+        const notes = await Note.find()
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        res.json({
+            page,
+            totalPages,
+            notes
+        });
     } catch (error) {
         res.status(500).json({message: 'Internal Server Error'});
     }
