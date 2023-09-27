@@ -21,6 +21,25 @@ app.get('/notes', async (req, res) => {
     }
 });
 
+app.post('/notes', async (req, res) => {
+    const {title, content} = req.body;
+
+    if (!title.trim() || !content.trim()) {
+        return res.status(400).json({message: 'Title and content are required'});
+    }
+
+    try {
+        const note = new Note({
+            title,
+            content,
+        });
+        await note.save();
+        res.status(201).json(note);
+    } catch (error) {
+        res.status(500).json({message: 'Internal Server Error'});
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
