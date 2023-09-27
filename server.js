@@ -56,6 +56,31 @@ app.delete('/notes/:id', async (req, res) => {
     }
 });
 
+app.put('/notes/:id', async (req, res) => {
+    const {id} = req.params;
+    const {title, content} = req.body;
+
+    if (!title || !content) {
+        return res.status(400).json({message: 'Title and content are required'});
+    }
+
+    try {
+        const updatedNote = await Note.findByIdAndUpdate(
+            id,
+            {title, content},
+            {new: true}
+        );
+
+        if (!updatedNote) {
+            return res.status(404).json({message: 'Note not found'});
+        }
+
+        res.json(updatedNote);
+    } catch (error) {
+        res.status(500).json({message: 'Internal Server Error'});
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
